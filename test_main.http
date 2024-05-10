@@ -1,0 +1,4 @@
+GET http://127.0.0.1:8000/generate-pix/57bdd2d7-6d21-4bb0-89f4-c4f63e478d91/RedSilver/sao%20paulo/78
+Accept: application/json
+
+###
