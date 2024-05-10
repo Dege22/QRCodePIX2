@@ -19,6 +19,8 @@ class PixData(BaseModel):
 app = FastAPI()
 
 # Serve Static Files, used for QR code image access
+if not os.path.exists('static'):
+    os.makedirs('static')
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def generate_txid() -> str:
