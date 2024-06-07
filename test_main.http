@@ -1,4 +1,24 @@
-GET http://127.0.0.1:8000/generate-pix/57bdd2d7-6d21-4bb0-89f4-c4f63e478d91/RedSilver/sao%20paulo/78
+GET http://127.0.0.1:8000/generate-pix/30a00589-1062-4a44-a011-f694dcff07d5/RedSilver/sao%20paulo/78
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/pix/gerados
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/generate-pix-fixo/86
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/trocar-chave/30a00589-1062-4a44-a011-f694dcff07d5
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/consultar-dados-fixos
+Accept: application/json
+
+###
+GET http://127.0.0.1:8000/zerar-contagem
 Accept: application/json
 
 ###
