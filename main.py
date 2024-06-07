@@ -16,6 +16,21 @@ class PixData(BaseModel):
     cidade_beneficiario: str
     valor_transferencia: float
 
+counter_file_path = 'counter.txt'
+
+def read_counter():
+    if not os.path.exists(counter_file_path):
+        with open(counter_file_path, 'w') as file:
+            file.write('0')
+    with open(counter_file_path, 'r') as file:
+        return int(file.read())
+
+def increment_counter():
+    count = read_counter() + 1
+    with open(counter_file_path, 'w') as file:
+        file.write(str(count))
+    return count
+
 app = FastAPI()
 
 # Serve Static Files, used for QR code image access
@@ -35,6 +50,7 @@ def generate_txid() -> str:
 
 @app.get("/generate-pix/{chave_aleatoria}/{nome_beneficiario}/{cidade_beneficiario}/{valor_transferencia:float}")
 async def generate_pix(request: Request, chave_aleatoria: str, nome_beneficiario: str, cidade_beneficiario: str, valor_transferencia: float):
+    increment_counter()
     old_stdout = sys.stdout
     new_stdout = io.StringIO()
     sys.stdout = new_stdout
@@ -81,3 +97,8 @@ async def download_qr_code(filename: str):
     if os.path.exists(file_path):
         return FileResponse(path=file_path, filename=filename, media_type='image/png')
     raise HTTPException(status_code=404, detail="File not found")
+
+@app.get("/pix/gerados")
+async def get_total_pix_generated():
+    total_pix_generated = read_counter()
+    return JSONResponse(content={"Total de pix gerados": total_pix_generated})
