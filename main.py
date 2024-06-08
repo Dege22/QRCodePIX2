@@ -11,17 +11,15 @@ from fastapi.staticfiles import StaticFiles
 import os
 from fastapi.middleware.cors import CORSMiddleware
 
-
 class PixData(BaseModel):
     chave_aleatoria: str
     nome_beneficiario: str
     cidade_beneficiario: str
     valor_transferencia: float
 
-
 counter_file_path = 'counter.txt'
 fixed_key_file_path = 'fixed_key.txt'
-
+url_counter_file_path = 'url_counter.txt'
 
 def read_counter():
     if not os.path.exists(counter_file_path):
@@ -30,18 +28,17 @@ def read_counter():
     with open(counter_file_path, 'r') as file:
         return int(file.read())
 
-
 def increment_counter():
     count = read_counter() + 1
     with open(counter_file_path, 'w') as file:
         file.write(str(count))
     return count
 
-
-def reset_counter():
-    with open(counter_file_path, 'w') as file:
-        file.write('0')
-
+def reset_url_counter():
+    url_counter = read_url_counter()
+    for url in url_counter.keys():
+        url_counter[url] = 0
+    write_url_counter(url_counter)
 
 def read_fixed_key():
     if not os.path.exists(fixed_key_file_path):
@@ -50,11 +47,32 @@ def read_fixed_key():
     with open(fixed_key_file_path, 'r') as file:
         return file.read().strip()
 
-
 def write_fixed_key(chave_aleatoria: str):
     with open(fixed_key_file_path, 'w') as file:
         file.write(chave_aleatoria)
 
+def read_url_counter():
+    if not os.path.exists(url_counter_file_path):
+        return {}
+    with open(url_counter_file_path, 'r') as file:
+        url_counter = {}
+        for line in file:
+            url, count = line.strip().split(',')
+            url_counter[url] = int(count)
+        return url_counter
+
+def write_url_counter(url_counter):
+    with open(url_counter_file_path, 'w') as file:
+        for url, count in url_counter.items():
+            file.write(f'{url},{count}\n')
+
+def increment_url_counter(url):
+    url_counter = read_url_counter()
+    if url in url_counter:
+        url_counter[url] += 1
+    else:
+        url_counter[url] = 1
+    write_url_counter(url_counter)
 
 app = FastAPI()
 
@@ -159,7 +177,7 @@ async def generate_pix_fixo(request: Request, valor_transferencia: float):
 
     increment_counter()
     nome_beneficiario = "Smokeria 021"
-    cidade_beneficiario = "SAO PAULO"
+    cidade_beneficiario = "RIO DE JANEIRO"
 
     old_stdout = sys.stdout
     new_stdout = io.StringIO()
@@ -227,5 +245,19 @@ async def consultar_dados_fixos():
 
 @app.get("/zerar-contagem")
 async def zerar_contagem():
-    reset_counter()
-    return JSONResponse(content={"message": "Contagem de Pix gerados zerada com sucesso!"})
+    reset_url_counter()
+    return JSONResponse(content={"message": "Contagem de acessos zerada com sucesso!"})
+
+
+@app.get("/contar-acesso/{var:path}")
+async def contar_acesso_var(request: Request, var: str):
+    base_url = str(request.base_url).rstrip("/")
+    url = f"{base_url}/contar-acesso/{var}"
+    increment_url_counter(url)
+    return JSONResponse(content={"message": f"Acesso registrado para URL: {url}"})
+
+
+@app.get("/acessos")
+async def get_acessos():
+    url_counter = read_url_counter()
+    return JSONResponse(content=url_counter)
