@@ -88,6 +88,7 @@ origins = [
     "http://localhost:5173",
     "http://localhost:10000",
     "http://localhost:33028",
+    "http://10.207.97.28:5173",
     # Add more origins if needed
 ]
 
