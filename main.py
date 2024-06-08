@@ -34,6 +34,10 @@ def increment_counter():
         file.write(str(count))
     return count
 
+def reset_pix_counter():
+    with open(counter_file_path, 'w') as file:
+        file.write('0')
+
 def reset_url_counter():
     url_counter = read_url_counter()
     for url in url_counter.keys():
@@ -246,8 +250,14 @@ async def consultar_dados_fixos():
     })
 
 
-@app.get("/zerar-contagem")
-async def zerar_contagem():
+@app.get("/zerar-contagem-pix")
+async def zerar_contagem_pix():
+    reset_pix_counter()
+    return JSONResponse(content={"message": "Contagem de Pix gerados zerada com sucesso!"})
+
+
+@app.get("/zerar-contagem-visitantes")
+async def zerar_contagem_visitantes():
     reset_url_counter()
     return JSONResponse(content={"message": "Contagem de acessos zerada com sucesso!"})
 
