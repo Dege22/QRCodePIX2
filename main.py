@@ -81,22 +81,9 @@ def increment_url_counter(url):
 app = FastAPI()
 
 # Add CORS middleware
-origins = [
-    "http://localhost",
-    "http://localhost:8000",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:10000",
-    "http://localhost:33028",
-    "http://10.207.97.28:5173",
-    "http://10.207.97.28:4173",
-    "https://api-pix-smokeria021.onrender.com",  # Adicione seu domínio real aqui
-    "https://smokeria-021.vercel.app"  # Adicione outros domínios necessários aqui
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
