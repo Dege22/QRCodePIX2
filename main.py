@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 import hashlib
@@ -80,7 +81,10 @@ def increment_url_counter(url):
 
 app = FastAPI()
 
-# Add CORS middleware
+# Forçar HTTPS
+app.add_middleware(HTTPSRedirectMiddleware)
+
+# Adicionar middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -89,13 +93,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve Static Files, used for QR code image access
-print("Diretório atual:", os.getcwd())
+# Servir arquivos estáticos
 if not os.path.exists('static'):
     os.makedirs('static')
-    print("Diretório 'static' criado em:", os.path.abspath('static'))
-else:
-    print("Diretório 'static' já existe em:", os.path.abspath('static'))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def generate_txid() -> str:
