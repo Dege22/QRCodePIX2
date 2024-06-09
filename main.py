@@ -90,7 +90,8 @@ origins = [
     "http://localhost:33028",
     "http://10.207.97.28:5173",
     "http://10.207.97.28:4173",
-    # Add more origins if needed
+    "https://api-pix-smokeria021.onrender.com",  # Adicione seu domínio real aqui
+    "https://smokeria-021.vercel.app"  # Adicione outros domínios necessários aqui
 ]
 
 app.add_middleware(
@@ -110,13 +111,11 @@ else:
     print("Diretório 'static' já existe em:", os.path.abspath('static'))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-
 def generate_txid() -> str:
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
     hash_digest = hashlib.sha1(timestamp.encode()).hexdigest()[:10]
     txid = f"{timestamp}{hash_digest}"
     return txid
-
 
 @app.get("/generate-pix/{chave_aleatoria}/{nome_beneficiario}/{cidade_beneficiario}/{valor_transferencia:float}")
 async def generate_pix(request: Request, chave_aleatoria: str, nome_beneficiario: str, cidade_beneficiario: str,
@@ -162,7 +161,6 @@ async def generate_pix(request: Request, chave_aleatoria: str, nome_beneficiario
             "Console Output": new_stdout.getvalue().strip()
         })
 
-
 @app.get("/download/{filename}")
 async def download_qr_code(filename: str):
     file_path = f"static/{filename}"
@@ -170,12 +168,10 @@ async def download_qr_code(filename: str):
         return FileResponse(path=file_path, filename=filename, media_type='image/png')
     raise HTTPException(status_code=404, detail="File not found")
 
-
 @app.get("/pix/gerados")
 async def get_total_pix_generated():
     total_pix_generated = read_counter()
     return JSONResponse(content={"Total de pix gerados": total_pix_generated})
-
 
 @app.get("/generate-pix-fixo/{valor_transferencia:float}")
 async def generate_pix_fixo(request: Request, valor_transferencia: float):
@@ -228,12 +224,10 @@ async def generate_pix_fixo(request: Request, valor_transferencia: float):
             "Console Output": new_stdout.getvalue().strip()
         })
 
-
 @app.get("/trocar-chave/{chave_aleatoria}")
 async def trocar_chave(chave_aleatoria: str):
     write_fixed_key(chave_aleatoria)
     return JSONResponse(content={"message": f"Chave aleatória substituída com sucesso! Nova chave: {chave_aleatoria}"})
-
 
 @app.get("/consultar-dados-fixos")
 async def consultar_dados_fixos():
@@ -251,18 +245,15 @@ async def consultar_dados_fixos():
         "Cidade": cidade_beneficiario
     })
 
-
 @app.get("/zerar-contagem-pix")
 async def zerar_contagem_pix():
     reset_pix_counter()
     return JSONResponse(content={"message": "Contagem de Pix gerados zerada com sucesso!"})
 
-
 @app.get("/zerar-contagem-visitantes")
 async def zerar_contagem_visitantes():
     reset_url_counter()
     return JSONResponse(content={"message": "Contagem de acessos zerada com sucesso!"})
-
 
 @app.get("/contar-acesso/{var:path}")
 async def contar_acesso_var(request: Request, var: str):
@@ -270,7 +261,6 @@ async def contar_acesso_var(request: Request, var: str):
     url = f"{base_url}/contar-acesso/{var}"
     increment_url_counter(url)
     return JSONResponse(content={"message": f"Acesso registrado para URL: {url}"})
-
 
 @app.get("/acessos")
 async def get_acessos():
