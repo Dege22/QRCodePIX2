@@ -253,3 +253,8 @@ async def contar_acesso_var(request: Request, var: str):
 async def get_acessos():
     url_counter = read_url_counter()
     return JSONResponse(content=url_counter)
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))  # Pega a porta da variável de ambiente ou usa a porta 8000 como padrão
+    uvicorn.run(app, host="0.0.0.0", port=port)
